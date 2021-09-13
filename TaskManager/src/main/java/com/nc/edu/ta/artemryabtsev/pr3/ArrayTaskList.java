@@ -33,6 +33,8 @@ public class ArrayTaskList extends AbstractTaskList {
 
     @Override
     public void add(Task task) {
+        if (task == null)
+            throw new RuntimeException("Task is empty");
         if (size == tasks.length) {
             tasks = Arrays.copyOf(tasks, tasks.length + 1);
         }

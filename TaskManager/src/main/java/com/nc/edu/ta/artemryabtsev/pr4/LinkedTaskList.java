@@ -22,6 +22,8 @@ public class LinkedTaskList extends AbstractTaskList {
     public void add(Task task) {
         Node tasks = new Node();
         tasks.data = task;
+        if (task == null)
+            throw new RuntimeException("Task is empty");
         if (head == null) {
             head = tasks;
             head.next = tail;
@@ -36,22 +38,29 @@ public class LinkedTaskList extends AbstractTaskList {
     @Override
     public void remove(Task task) {
         Node current = head;
-        Node preview = head;
 
-        while (current.data != task){
-            if(current.next == null)
-                return;
-            if (head == null) {
-                return;
-            } else {
-                preview = current;
-                current = current.next;
-            }
-            if (current == head)
-                head = head.next;
-            else
-                preview.next = current.next;
+        if (task == null)
+            throw new RuntimeException("Task is empty");
+
+        if (head.data == task) {
+            head = head.next;
             size--;
+        }
+
+        while (current.data != null) {
+
+            if (current.next == null)
+                return;
+
+            if(current.next.data == task) {
+                if (tail == current.next) {
+                    tail = current;
+                }
+                current.next = current.next.next;
+                size--;
+                return;
+            }
+            current = current.next;
         }
     }
 
@@ -60,6 +69,9 @@ public class LinkedTaskList extends AbstractTaskList {
         Node current = head;
         Node temp = head;
         int counter = 0;
+
+        if (index < 0 || index >= this.size)
+            throw new IndexOutOfBoundsException("On getTask(-1) exception expected");
 
         while (counter != index) {
             if(current.next == null)
@@ -73,32 +85,23 @@ public class LinkedTaskList extends AbstractTaskList {
 
     public Task[] incoming(int from, int to) {
         Node current = head;
-        Node incoming = new Node();
-        LinkedTaskList tasks = new LinkedTaskList();
+        LinkedTaskList filteredTasks = new LinkedTaskList();
 
          for (int i = 0; i < this.size; i++) {
-             if (isChek(current.data, from, to)){
-                 if (incoming.data == null)
-                    incoming = current;
-                 tasks.add(current.data);
-                 if (current.next == null)
-                     break;
+             if (shouldBeInvokedInPeriod(current.data, from, to)){
+                 filteredTasks.add(current.data);
               }
              current = current.next;
-             if(current.next == null){
-                 if (incoming.data == null)
-                     return new Task[0];
-             }
         }
 
-         Task[] task = new Task[tasks.size];
-         for(int i = 0; i < tasks.size; i++) {
-             task[i] = tasks.getTask(i);
+         Task[] task = new Task[filteredTasks.size];
+         for(int i = 0; i < filteredTasks.size; i++) {
+             task[i] = filteredTasks.getTask(i);
          }
         return task;
     }
 
-    private boolean isChek(Task element, int from, int to){
+    private boolean shouldBeInvokedInPeriod(Task element, int from, int to){
         return (((element.getTime() > from && element.getTime() <= to)
                 || (element.nextTimeAfter(from) > from && element.nextTimeAfter(from) <= to))
                 && element.isActive());
