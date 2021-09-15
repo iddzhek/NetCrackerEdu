@@ -1,6 +1,7 @@
 package com.nc.edu.ta.artemryabtsev.pr3;
 
 import com.nc.edu.ta.artemryabtsev.pr2.Task;
+import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskValueException;
 
 import java.util.*;
 
@@ -34,7 +35,7 @@ public class ArrayTaskList extends AbstractTaskList {
     @Override
     public void add(Task task) {
         if (task == null)
-            throw new RuntimeException("Task is empty");
+            throw new InvalidTaskValueException();
         if (size == tasks.length) {
             tasks = Arrays.copyOf(tasks, tasks.length + 1);
         }

@@ -1,5 +1,9 @@
 package com.nc.edu.ta.artemryabtsev.pr2;
 
+import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskIndexException;
+import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskParametersException;
+import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskValueException;
+
 public class Task {
     private String title;
     private boolean active;
@@ -17,8 +21,10 @@ public class Task {
         setRepeated(false);
         if (time == 0)
             setActive(false);
-        if (title == "" || time < 0 || title == null)
-            throw new RuntimeException("invalid argument value");
+        if (title == "" || time < 0)
+            throw new InvalidTaskParametersException("invalid argument value");
+        if (title == null)
+            throw new InvalidTaskValueException("invalid argument value");
     }
 
     public Task(String title, int start, int end, int repeat) {
@@ -29,15 +35,19 @@ public class Task {
         this.repeat = repeat;
         setRepeated(true);
 
-        if (start > end || start < 0 || repeat < 0 || title == "" || title == null)
-            throw new RuntimeException("invalid argument value");
+        if (start > end || start < 0 || repeat < 0 || title == "")
+            throw new InvalidTaskParametersException("invalid argument value");
+        if (title == null)
+            throw new InvalidTaskValueException("invalid argument value");
     }
 
 
     public void setTitle(String title){
         this.title = title;
-        if (title == null || title == "")
-            throw new RuntimeException("invalid argument value");
+        if (title == "")
+            throw new InvalidTaskIndexException("invalid argument value");
+        if (title == null)
+            throw new InvalidTaskValueException("invalid argument value");
     }
 
     public void setActive(boolean active) {
@@ -56,7 +66,7 @@ public class Task {
         this.repeated = false;
 
         if (time <= 0){
-            throw new RuntimeException("invalid argument value");
+            throw new InvalidTaskIndexException("invalid argument value");
         }
     }
 
@@ -68,7 +78,7 @@ public class Task {
         this.repeated = true;
 
         if (start <= 0 || start >= end || end <= 0 || repeat < 0){
-            throw new RuntimeException("invalid argument value");
+            throw new InvalidTaskIndexException("invalid argument value");
         }
     }
 

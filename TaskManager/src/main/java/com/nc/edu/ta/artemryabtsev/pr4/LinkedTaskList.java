@@ -2,6 +2,8 @@ package com.nc.edu.ta.artemryabtsev.pr4;
 
 import com.nc.edu.ta.artemryabtsev.pr2.Task;
 import com.nc.edu.ta.artemryabtsev.pr3.AbstractTaskList;
+import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskIndexException;
+import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskValueException;
 
 
 public class LinkedTaskList extends AbstractTaskList {
@@ -23,7 +25,7 @@ public class LinkedTaskList extends AbstractTaskList {
         Node tasks = new Node();
         tasks.data = task;
         if (task == null)
-            throw new RuntimeException("Task is empty");
+            throw new InvalidTaskValueException();
         if (head == null) {
             head = tasks;
             head.next = tail;
@@ -36,11 +38,11 @@ public class LinkedTaskList extends AbstractTaskList {
     }
 
     @Override
-    public void remove(Task task) {
-        Node current = head;
-
+    public void remove(Task task) throws InvalidTaskValueException{
         if (task == null)
-            throw new RuntimeException("Task is empty");
+            throw new InvalidTaskValueException();
+
+        Node current = head;
 
         if (head.data == task) {
             head = head.next;
@@ -65,13 +67,15 @@ public class LinkedTaskList extends AbstractTaskList {
     }
 
     @Override
-    public Task getTask(int index) {
+    public Task getTask(int index) throws InvalidTaskIndexException {
+        if (index < 0 )
+            throw new InvalidTaskIndexException("invalid element index entered");
+        if (index >= this.size)
+            throw new InvalidTaskIndexException("invalid element index entered");
+
         Node current = head;
         Node temp = head;
         int counter = 0;
-
-        if (index < 0 || index >= this.size)
-            throw new IndexOutOfBoundsException("On getTask(-1) exception expected");
 
         while (counter != index) {
             if(current.next == null)
