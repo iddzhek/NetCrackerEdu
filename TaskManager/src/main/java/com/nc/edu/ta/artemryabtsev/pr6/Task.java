@@ -1,8 +1,4 @@
-package com.nc.edu.ta.artemryabtsev.pr2;
-
-import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskIndexException;
-import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskParametersException;
-import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskValueException;
+package com.nc.edu.ta.artemryabtsev.pr6;
 
 public class Task implements Cloneable{
     private String title;
@@ -77,7 +73,7 @@ public class Task implements Cloneable{
         this.repeat = repeat;
         this.repeated = true;
 
-        if (start <= 0 || start >= end || end <= 0 || repeat < 0){
+        if (start < 0 || start >= end || end <= 0 || repeat < 0){
             throw new InvalidTaskIndexException("invalid argument value");
         }
     }
@@ -153,8 +149,10 @@ public class Task implements Cloneable{
 
     @Override
     public boolean equals(Object t){
-        if (this.getClass() != t.getClass()){
+        if (t == null)
             return false;
+        if (this.getClass() != t.getClass()){
+                return false;
         }else if (this.hashCode() != t.hashCode()){
             return false;
         }else {
@@ -172,4 +170,66 @@ public class Task implements Cloneable{
     public int hashCode(){
         return 31 * (title.hashCode() + 31 * (time + 31 * (start + 31 * (end + 31 * (repeat)))));
     }
+
+
+// constructors and methods with date
+//    private Date dataTime;
+//    private Date dataStart;
+//    private Date dataEnd;
+//
+//    public Task(String title, Date dataTime) {
+//        this.title = title;
+//        this.dataTime = dataTime;
+//        setRepeated(false);
+//    }
+//
+//    public Task(String title, Date from, Date to, int interval) {
+//        this.title = title;
+//        this.dataStart = from;
+//        this.dataEnd = to;
+//        this.repeat = repeat;
+//        setRepeated(true);
+//    }
+//
+//    public void setTime(Date dataTime){
+//        this.dataTime = dataTime;
+//        this.dataStart = dataTime;
+//        this.dataEnd = dataTime;
+//        this.repeat = 0;
+//        this.repeated = false;
+//
+//        if (time <= 0){
+//            throw new InvalidTaskIndexException("invalid argument value");
+//        }
+//    }
+//
+//    public void setTime(Date dataStart, Date dataEnd, int repeat){
+//        this.dataTime = dataTime;
+//        this.dataStart = dataStart;
+//        this.dataEnd = dataEnd;
+//        this.repeat = repeat;
+//        this.repeated = true;
+//    }
+//
+//    public Date nextTimeAfter(Date data){
+//        System.out.println("Data: 1. " + data.getTime() + " | 2. " + data);
+//        System.out.println("dataTime: 1. " + dataTime.getTime() + "| 2. " + dataTime);
+//        if (data == null){
+//            throw new RuntimeException("invalid argument value");
+//        }
+//        if (!isActive())
+//            return null;
+//        if (data.before(this.dataTime)){
+//            return this.dataTime;
+//        }
+//        if (data.equals(this.dataTime) || data.after(this.dataTime))
+//            return null;
+////        if (data.getTime() > TODAY.getTime()){
+////            for (int i = 0; i < 24000; i+= 1000){
+////                if (TODAY.getTime() + HOUR * (i + 1)== data.getTime() + HOUR * (i + 2))
+////                    return new Date(TODAY.getTime() + HOUR * i);
+////            }
+////        }
+//        return null;
+//    }
 }

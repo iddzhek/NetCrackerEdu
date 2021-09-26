@@ -1,11 +1,10 @@
-package com.nc.edu.ta.artemryabtsev.pr3;
+package com.nc.edu.ta.artemryabtsev.pr6;
 
-import com.nc.edu.ta.artemryabtsev.pr2.Task;
-import com.nc.edu.ta.artemryabtsev.pr5.InvalidTaskValueException;
+import java.util.Arrays;
 
-//import java.util.Arrays;
+public class ArrayTaskList implements AbstractTaskList {
 
-public class ArrayTaskList extends AbstractTaskList {
+    private int size = 0;
 
     Task[] tasks = new Task[0];
 
@@ -33,12 +32,12 @@ public class ArrayTaskList extends AbstractTaskList {
     }
 
     @Override
-    public void add(Task task) {
+    public void add(Object task) {
         if (task == null)
             throw new InvalidTaskValueException();
         Task[] newTasksOne = new Task[tasks.length + 1];
         if (size == 0) {
-            newTasksOne[size] = task;
+            newTasksOne[size] = (Task) task;
             size++;
             tasks = newTasksOne;
             return;
@@ -48,7 +47,7 @@ public class ArrayTaskList extends AbstractTaskList {
         tasks = newTasksTwo;
         for (int i = 0; i < tasks.length; i++) {
             if (i == tasks.length - 1) {
-                tasks[i] = task;
+                tasks[i] = (Task) task;
                 size++;
                 return;
             }
@@ -56,10 +55,9 @@ public class ArrayTaskList extends AbstractTaskList {
         }
     }
 
-
     @Override
-    public void remove(Task task) {
-        Task searchKey = task;
+    public void remove(Object task) {
+        Task searchKey = (Task) task;
         Task[] newTasks = new Task[tasks.length - 1];
         for (int i = 0; i < tasks.length; i++) {
             if (tasks[i] == searchKey) {
@@ -75,8 +73,49 @@ public class ArrayTaskList extends AbstractTaskList {
         size--;
     }
 
-    @Override
     public Task getTask(int index) {
-        return (Task) tasks[index];
+        return tasks[index];
+    }
+
+    @Override
+    public Task[] clone()  {
+        Task[] cloneArray = new Task[0];
+        for (int i = 0; i < tasks.length; i++){
+            cloneArray[i] = tasks[i];
+        }
+        return cloneArray;
+    }
+
+    public boolean equals(Object t){
+        if (t == null)
+            return false;
+        if (this.getClass() != t.getClass()){
+            return false;
+        }
+        if (((ArrayTaskList) t).size == this.size){
+            for (int i = 0; i < this.size; i++){
+                if (this.getTask(i).hashCode() != ((ArrayTaskList) t).getTask(i).hashCode())
+                    return false;
+            }
+        }else {
+            Task[] task = (Task[]) t;
+            for (int i = 0; i < this.size; i++){
+                return this.getTask(i).getTitle() == task[i].getTitle()
+                        && this.getTask(i).isActive() == task[i].isActive()
+                        && this.getTask(i).isRepeated() == task[i].isRepeated()
+                        && this.getTask(i).getTime() == task[i].getTime()
+                        && this.getTask(i).getStartTime() == task[i].getStartTime()
+                        && this.getTask(i).getEndTime() == task[i].getEndTime()
+                        && this.getTask(i).getRepeatInterval() == task[i].getRepeatInterval();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "ArrayTaskList " +
+                "size= " + size +
+                ", tasks= " + Arrays.toString(tasks);
     }
 }
