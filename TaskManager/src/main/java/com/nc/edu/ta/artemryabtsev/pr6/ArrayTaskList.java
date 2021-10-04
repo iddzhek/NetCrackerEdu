@@ -32,7 +32,7 @@ public class ArrayTaskList implements AbstractTaskList {
     }
 
     @Override
-    public void add(Object task) {
+    public void add(Task task) {
         if (task == null)
             throw new InvalidTaskValueException();
         Task[] newTasksOne = new Task[tasks.length + 1];
@@ -56,7 +56,7 @@ public class ArrayTaskList implements AbstractTaskList {
     }
 
     @Override
-    public void remove(Object task) {
+    public void remove(Task task) {
         Task searchKey = (Task) task;
         Task[] newTasks = new Task[tasks.length - 1];
         for (int i = 0; i < tasks.length; i++) {

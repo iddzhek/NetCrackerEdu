@@ -1,6 +1,6 @@
 package com.nc.edu.ta.artemryabtsev.pr6;
 
-public interface AbstractTaskList<Task>{
+public interface AbstractTaskList{
 
     int size = 0;
 
@@ -8,7 +8,7 @@ public interface AbstractTaskList<Task>{
 
     void remove(Task task);
 
-    Task clone();
+    Object clone();
 
 //public abstract class AbstractTaskList implements Cloneable {
 //

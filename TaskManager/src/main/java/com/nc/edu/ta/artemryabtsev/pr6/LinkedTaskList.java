@@ -1,9 +1,11 @@
 package com.nc.edu.ta.artemryabtsev.pr6;
 
+import java.util.Iterator;
 
-public class LinkedTaskList implements AbstractTaskList {
+public class LinkedTaskList implements AbstractTaskList, Iterator {
 
     private int size = 0;
+    private int count = 0;
 
     Node head;
     Node tail;
@@ -18,7 +20,7 @@ public class LinkedTaskList implements AbstractTaskList {
     }
 
     @Override
-    public void add(Object task) {
+    public void add(Task task) {
         Node tasks = new Node();
         tasks.data = (Task) task;
         if (task == null)
@@ -35,22 +37,17 @@ public class LinkedTaskList implements AbstractTaskList {
     }
 
     @Override
-    public void remove(Object task) throws InvalidTaskValueException{
+    public void remove(Task task) throws InvalidTaskValueException{
         if (task == null)
             throw new InvalidTaskValueException();
-
         Node current = head;
-
         if (head.data == task) {
             head = head.next;
             size--;
         }
-
         while (current.data != null) {
-
             if (current.next == null)
                 return;
-
             if(current.next.data == task) {
                 if (tail == current.next) {
                     tail = current;
@@ -87,14 +84,12 @@ public class LinkedTaskList implements AbstractTaskList {
     public Task[] incoming(int from, int to) {
         Node current = head;
         LinkedTaskList filteredTasks = new LinkedTaskList();
-
          for (int i = 0; i < this.size; i++) {
              if (shouldBeInvokedInPeriod(current.data, from, to)){
                  filteredTasks.add(current.data);
               }
              current = current.next;
         }
-
          Task[] task = new Task[filteredTasks.size];
          for(int i = 0; i < filteredTasks.size; i++) {
              task[i] = filteredTasks.getTask(i);
@@ -112,48 +107,73 @@ public class LinkedTaskList implements AbstractTaskList {
 
 
     @Override
-    public Task[] clone() {
-        System.out.println("List");
+    public LinkedTaskList clone() {
         LinkedTaskList cloneList = new LinkedTaskList();
-        for (int i = 0; i < this.size; i++){
-            cloneList.add(this.getTask(i));
+        while (this.hasNext()){
+            Task task = (Task) this.next();
+            cloneList.add(task);
         }
-        Task[] task = new Task[cloneList.size];
-        for(int i = 0; i < cloneList.size; i++) {
-            task[i] = cloneList.getTask(i);
-        }
-        return task;
+
+//        for (int i = 0; i < this.size; i++) {
+//        }
+//        Task[] task = new Task[cloneList.size];
+//        for(int i = 0; i < cloneList.size; i++) {
+//            task[i] = cloneList.getTask(i);
+//        }
+//        return task;
+//        }
+        return cloneList;
     }
 
     @Override
     public String toString() {
         return "LinkedTaskList " +
-                "head " + head +
-                ", tail = " + tail;
+                "head " + head.data +
+                ", tail = " + tail.data;
     }
 
-    public boolean equals(Object t){
+    public boolean equals(Object t) {
         if (t == null)
             return false;
-        if (this.getClass() != t.getClass()){
+        if (this.getClass() != t.getClass()) {
             return false;
-        }
-        if (((LinkedTaskList) t).size == this.size){
-            for (int i = 0; i < this.size; i++){
+        } else if (((LinkedTaskList) t).size == this.size) {
+            for (int i = 0; i < this.size; i++) {
                 if (this.getTask(i).hashCode() != ((LinkedTaskList) t).getTask(i).hashCode())
                     return false;
             }
-        }else {
-            for (int i = 0; i < this.size; i++){
-                return this.getTask(i).getTitle() == getTask(i).getTitle()
-                        && this.getTask(i).isActive() == getTask(i).isActive()
-                        && this.getTask(i).isRepeated() == getTask(i).isRepeated()
-                        && this.getTask(i).getTime() == getTask(i).getTime()
-                        && this.getTask(i).getStartTime() == getTask(i).getStartTime()
-                        && this.getTask(i).getEndTime() == getTask(i).getEndTime()
-                        && this.getTask(i).getRepeatInterval() == getTask(i).getRepeatInterval();
+        }
+        for (int i = 0; i < this.size; i++) {
+            if (!checkingEqualityValueOfTheObjectFields(i)){
+                return false;
             }
         }
+        return true;
+    }
+
+    public boolean checkingEqualityValueOfTheObjectFields(int i){
+        return  (this.getTask(i).getTitle() == getTask(i).getTitle()
+                && this.getTask(i).isActive() == getTask(i).isActive()
+                && this.getTask(i).isRepeated() == getTask(i).isRepeated()
+                && this.getTask(i).getTime() == getTask(i).getTime()
+                && this.getTask(i).getStartTime() == getTask(i).getStartTime()
+                && this.getTask(i).getEndTime() == getTask(i).getEndTime()
+                && this.getTask(i).getRepeatInterval() == getTask(i).getRepeatInterval());
+    }
+
+    @Override
+    public boolean hasNext() {
+        if (count < this.size){
+            return true;
+        }
         return false;
+    }
+
+    @Override
+    public Object next() {
+        if (!hasNext()) {
+            throw new RuntimeException();
+        }
+        return this.getTask(count++);
     }
 }
