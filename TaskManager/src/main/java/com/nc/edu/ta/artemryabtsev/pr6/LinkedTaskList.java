@@ -1,14 +1,46 @@
 package com.nc.edu.ta.artemryabtsev.pr6;
 
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
-public class LinkedTaskList implements AbstractTaskList, Iterator {
+public class LinkedTaskList implements AbstractTaskList, Iterable {
 
     private int size = 0;
     private int count = 0;
 
     Node head;
     Node tail;
+
+    @Override
+    public Iterator<Task> iterator() {
+        return new Iterator() {
+            Node current = head;
+            @Override
+            public boolean hasNext() {
+                return current.next != null;
+            }
+
+            @Override
+            public Task next() {
+                if (!hasNext()) {
+                    throw new RuntimeException();
+                }
+                current = current.next;
+                return current.data;
+            }
+        };
+    }
+
+    @Override
+    public void forEach(Consumer action) {
+
+    }
+
+    @Override
+    public Spliterator spliterator() {
+        return null;
+    }
 
     class Node{
         Task data;
@@ -109,8 +141,9 @@ public class LinkedTaskList implements AbstractTaskList, Iterator {
     @Override
     public LinkedTaskList clone() {
         LinkedTaskList cloneList = new LinkedTaskList();
-        while (this.hasNext()){
-            Task task = (Task) this.next();
+        Iterator<Task> taskIterator = this.iterator();
+        while (taskIterator.hasNext()){
+            Task task = (Task) taskIterator.next();
             cloneList.add(task);
         }
 
@@ -144,36 +177,10 @@ public class LinkedTaskList implements AbstractTaskList, Iterator {
             }
         }
         for (int i = 0; i < this.size; i++) {
-            if (!checkingEqualityValueOfTheObjectFields(i)){
+            if (!this.getTask(i).equals(((LinkedTaskList) t).getTask(i))){
                 return false;
             }
         }
         return true;
-    }
-
-    public boolean checkingEqualityValueOfTheObjectFields(int i){
-        return  (this.getTask(i).getTitle() == getTask(i).getTitle()
-                && this.getTask(i).isActive() == getTask(i).isActive()
-                && this.getTask(i).isRepeated() == getTask(i).isRepeated()
-                && this.getTask(i).getTime() == getTask(i).getTime()
-                && this.getTask(i).getStartTime() == getTask(i).getStartTime()
-                && this.getTask(i).getEndTime() == getTask(i).getEndTime()
-                && this.getTask(i).getRepeatInterval() == getTask(i).getRepeatInterval());
-    }
-
-    @Override
-    public boolean hasNext() {
-        if (count < this.size){
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public Object next() {
-        if (!hasNext()) {
-            throw new RuntimeException();
-        }
-        return this.getTask(count++);
     }
 }
