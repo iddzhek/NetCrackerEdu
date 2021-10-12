@@ -41,6 +41,10 @@ public class Task implements Cloneable{
             throw new InvalidTaskValueException("invalid argument value");
     }
 
+    public Task() {
+
+    }
+
 
     public void setTitle(String title){
         this.title = title;
@@ -65,7 +69,7 @@ public class Task implements Cloneable{
         this.repeat = 0;
         this.repeated = false;
 
-        if (time <= 0){
+        if (time < 0){
             throw new InvalidTaskIndexException("invalid argument value");
         }
     }
@@ -77,7 +81,7 @@ public class Task implements Cloneable{
         this.repeat = repeat;
         this.repeated = true;
 
-        if (start <= 0 || start >= end || end <= 0 || repeat < 0){
+        if (start < 0 || start > end || end < 0 || repeat < 0){
             throw new InvalidTaskIndexException("invalid argument value");
         }
     }
