@@ -4,241 +4,302 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class UItest {
+public class UItest{
 
-    String userName = "registerForm:username";
-    String userPassword = "registerForm:password";
-    String confirmPassword = "registerForm:confirmPassword";
-    String email = "registerForm:email";
-    String registerForm = "registerForm:j_idt26";
+    @FindBy(id = "registerForm:username")
+    WebElement fieldName;
 
-    Generation gen = new Generation();
+    @FindBy(id = "registerForm:password")
+    WebElement fieldPassword;
+
+    @FindBy(id = "registerForm:confirmPassword")
+    WebElement fieldConfirmPassword;
+
+    @FindBy(id = "registerForm:email")
+    WebElement fieldEmail;
+
+    @FindBy(name = "registerForm:j_idt26")
+    WebElement buttonReg;
+
+    @FindBy(xpath = "//tr[1]/td[3]/span")
+    WebElement wayErrorFieldName;
+
+    @FindBy(xpath = "//tr[2]/td[3]/span")
+    WebElement wayErrorFieldPassword;
+
+    @FindBy(xpath = "//tr[3]/td[3]/span")
+    WebElement wayErrorFieldConfirmPassword;
+
+    @FindBy(xpath = "//tr[5]/td[3]/span")
+    WebElement wayErrorFieldEmail;
+
+    @FindBy(xpath = "//div[2]/div")
+    WebElement wayMessageOfRegistration;
+
+    @FindBy(xpath = "//tr[1]/td[3]/span")
+    WebElement wayErrorNameRepeat;
+
+    @FindBy(xpath = "//div/div[2]/div")
+    WebElement wayErrorMaxNumberUser;
+
+    Generation generation = new Generation();
+    String userName = generation.generationUserName();    
+    String userPassword = generation.generationUserPassword();
+    String userEmail = generation.generationEmail();
+
     public ChromeDriver driver;
 
     @Before
     public void setup() {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Properties properties = new Properties();
+        try (InputStream resourceStream = loader.getResourceAsStream("application-test.properties")){
+            properties.load(resourceStream);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
         System.setProperty("webdriver.chrome.driver", "D:\\NetCracker\\Lab\\pr7\\tools\\chromedriver.exe");
         driver = new ChromeDriver();
     }
 
+    public void init(WebDriver driver){
+        PageFactory.initElements(driver, this);
+    }
+
     @Test
-    public void testUserName() throws NoSuchElementException {
+    public void testUserName() {
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
+        init(driver);
         try {
-            driver.findElement(By.id(userName)).sendKeys(gen.generationUserName());
-            driver.findElement(By.name(registerForm)).click();
-            assertNull(driver.findElement(By.xpath("//tr[1]/td[3]/span")));
-            Assert.fail("Expected NoSuchElementException");
-        } catch (NoSuchElementException thrown) {
+            fieldName.sendKeys(userName);
+            buttonReg.click();
+            assertNull(wayErrorFieldName);
+            Assert.fail("Expected AssertionError");
+        } catch (AssertionError thrown) {
             Assert.assertNotEquals("", thrown.getMessage());
         }
 
-        driver.findElement(By.id(userName)).clear();
-        driver.findElement(By.id(userName)).sendKeys("Name");
-        driver.findElement(By.name(registerForm)).click();
+        fieldName.clear();
+        fieldName.sendKeys(generation.generationLowerChar(2,5));
+        buttonReg.click();
         assertEquals("Login must be alphanumeric string with length => 6 and <= 50.",
-                driver.findElement(By.xpath("//tr[1]/td[3]/span")).getText());
+                wayErrorFieldName.getText());
 
-        driver.findElement(By.id(userName)).clear();
-        driver.findElement(By.id(userPassword)).sendKeys("!@#$%^&*()");
-        driver.findElement(By.name(confirmPassword)).click();
+        fieldName.clear();
+        fieldName.sendKeys(generation.generationSymbol(7,10));
+        buttonReg.click();
         assertEquals("Login must be alphanumeric string with length => 6 and <= 50.",
-                driver.findElement(By.xpath("//tr[1]/td[3]/span")).getText());
+                wayErrorFieldName.getText());
 
-        driver.findElement(By.id("registerForm:username")).clear();//данная проверка должна выдавать сообщение "Login must be alphanumeric string with length => 6 and <= 50."
-        driver.findElement(By.id("registerForm:username")).sendKeys("Name123Name123Name123Name123Name123Name123Name123Na");
-        driver.findElement(By.name("registerForm:j_idt26")).click();
-        assertEquals("Login must be alphanumeric string with length => 6 and <= 50.",
-                driver.findElement(By.xpath("//tr[1]/td[3]/span")).getText());
+//        fieldName.clear();//данная проверка должна выдавать сообщение "Login must be alphanumeric string with length => 6 and <= 50."
+//        fieldName.sendKeys("Name123Name123Name123Name123Name123Name123Name123Na");
+//        buttonReg.click();
+//        assertEquals("Login must be alphanumeric string with length => 6 and <= 50.",
+//                wayErrorFieldName.getText());
 
-        driver.findElement(By.id(userName)).clear();
-        driver.findElement(By.id(confirmPassword)).sendKeys("");
-        driver.findElement(By.name(registerForm)).click();
+        fieldName.clear();
+        fieldName.sendKeys("");
+        buttonReg.click();
         assertEquals("Login must not be empty.",
-                driver.findElement(By.xpath("//tr[1]/td[3]/span")).getText());
+                wayErrorFieldName.getText());
     }
 
     @Test
-    public void testUserPassword() throws NoSuchElementException{
+    public void testUserPassword() {
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
-        driver.findElement(By.id(userPassword)).sendKeys(gen.generationUserPassword());
-        driver.findElement(By.name(registerForm)).click();
+        init(driver);
+
+        fieldPassword.sendKeys(userPassword);
+        buttonReg.click();
         assertEquals("Password must match confirm password.",
-                driver.findElement(By.xpath("//tr[2]/td[3]/span")).getText());
+                wayErrorFieldPassword.getText());
 
-        driver.findElement(By.id(userPassword)).clear();
-        driver.findElement(By.id(userPassword)).sendKeys("");
-        driver.findElement(By.name(registerForm)).click();
+        fieldPassword.clear();
+        fieldPassword.sendKeys("");
+        buttonReg.click();
         assertEquals("Please enter password.",
-                driver.findElement(By.xpath("//tr[2]/td[3]/span")).getText());
+                wayErrorFieldPassword.getText());
 
-        driver.findElement(By.id(userPassword)).clear();
-        driver.findElement(By.id(userPassword)).sendKeys("Password");
-        driver.findElement(By.name(registerForm)).click();
+        fieldPassword.clear();
+        fieldPassword.sendKeys("Password");
+        buttonReg.click();
         assertEquals("At least one digit must be in password",
-                driver.findElement(By.xpath("//tr[2]/td[3]/span")).getText());
+                wayErrorFieldPassword.getText());
 
-        driver.findElement(By.id(userPassword)).clear();
-        driver.findElement(By.id(userPassword)).sendKeys("Passwor");
-        driver.findElement(By.name(registerForm)).click();
+        fieldPassword.clear();
+        fieldPassword.sendKeys("Passwor");
+        buttonReg.click();
         assertEquals("Password length must me >= 8 and <= 50.",
-                driver.findElement(By.xpath("//tr[2]/td[3]/span")).getText());
+                wayErrorFieldPassword.getText());
 
-        driver.findElement(By.id(userPassword)).clear();
-        driver.findElement(By.id(userPassword)).sendKeys("Password1");
-        driver.findElement(By.name(registerForm)).click();
+        fieldPassword.clear();
+        fieldPassword.sendKeys("Password1");
+        buttonReg.click();
         assertEquals("At least one non alpha numeric symbol must be in password",
-                driver.findElement(By.xpath("//tr[2]/td[3]/span")).getText());
+                wayErrorFieldPassword.getText());
 
-        driver.findElement(By.id(userPassword)).clear();
-        driver.findElement(By.id(userPassword)).sendKeys("password1!");
-        driver.findElement(By.name(registerForm)).click();
+        fieldPassword.clear();
+        fieldPassword.sendKeys("password1!");
+        buttonReg.click();
         assertEquals("At least one upper letter must be in password",
-                driver.findElement(By.xpath("//tr[2]/td[3]/span")).getText());
+                wayErrorFieldPassword.getText());
     }
 
     @Test
-    public void testUserConfirmPassword() throws NoSuchElementException{
+    public void testUserConfirmPassword(){
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
+        init(driver);
+
         try{
-            driver.findElement(By.id(confirmPassword)).sendKeys(gen.generationUserPassword());
-            driver.findElement(By.name(registerForm)).click();
-            assertNull(driver.findElement(By.xpath("//tr[3]/td[3]/span")));
-            Assert.fail("Exception NoSuchElementException");
-        }catch (NoSuchElementException thrown){
+            fieldConfirmPassword.sendKeys(userPassword);
+            buttonReg.click();
+            assertNull(wayErrorFieldConfirmPassword);
+            Assert.fail("Exception AssertionError");
+        }catch (AssertionError thrown){
             Assert.assertNotEquals("", thrown.getMessage());
         }
 
-        driver.findElement(By.id(confirmPassword)).sendKeys("");
-        driver.findElement(By.name(registerForm)).click();
+        fieldConfirmPassword.sendKeys("");
+        buttonReg.click();
         assertEquals("Please enter confirm password",
-                driver.findElement(By.xpath("//tr[3]/td[3]/span")).getText());
+                wayErrorFieldConfirmPassword.getText());
 
 // Не появляются сообщения о неверном вводе данных
-//        driver.findElement(By.id("registerForm:confirmPassword")).clear();
-//        driver.findElement(By.id("registerForm:confirmPassword")).sendKeys("Password");
-//        driver.findElement(By.name("registerForm:j_idt26")).click();
+//        fieldConfirmPassword.clear();
+//        fieldConfirmPassword.sendKeys("Password");
+//        buttonReg.click();
 //        assertEquals("At least one digit must be in confirm password",
-//                driver.findElement(By.xpath("//tr[3]/td[3]/span")).getText());
+//                wayErrorFieldConfirmPassword.getText());
 //
-//        driver.findElement(By.id("registerForm:confirmPassword")).clear();
-//        driver.findElement(By.id("registerForm:confirmPassword")).sendKeys("Passwor");
-//        driver.findElement(By.name("registerForm:j_idt26")).click();
+//        fieldConfirmPassword.clear();
+//        fieldConfirmPassword.sendKeys("Passwor");
+//        buttonReg.click();
 //        assertEquals("Confirm password length must me >= 8 and <= 50.",
-//                driver.findElement(By.xpath("//tr[3]/td[3]/span")).getText());
+//                wayErrorFieldConfirmPassword.getText());
 //
-//        driver.findElement(By.id("registerForm:confirmPassword")).clear();
-//        driver.findElement(By.id("registerForm:confirmPassword")).sendKeys("Password1");
-//        driver.findElement(By.name("registerForm:j_idt26")).click();
+//        fieldConfirmPassword.clear();
+//        fieldConfirmPassword.sendKeys("Password1");
+//        buttonReg.click();
 //        assertEquals("At least one non alpha numeric symbol must be in confirm password",
-//                driver.findElement(By.xpath("//tr[3]/td[3]/span")).getText());
+//                wayErrorFieldConfirmPassword.getText());
 //
-//        driver.findElement(By.id("registerForm:confirmPassword")).clear();
-//        driver.findElement(By.id("registerForm:confirmPassword")).sendKeys("password1!");
-//        driver.findElement(By.name("registerForm:j_idt26")).click();
+//        fieldConfirmPassword.clear();
+//        fieldConfirmPassword.sendKeys("password1!");
+//        buttonReg.click();
 //        assertEquals("At least one upper letter must be in confirm password",
-//                driver.findElement(By.xpath("//tr[3]/td[3]/span")).getText());
+//                wayErrorFieldConfirmPassword.getText());
     }
 
     @Test
-    public void testUserEmail() throws NoSuchElementException{
+    public void testUserEmail(){
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
+        init(driver);
         try{
-            driver.findElement(By.id(email)).sendKeys(gen.generationEmail());
-            driver.findElement(By.name(registerForm)).click();
-            assertNull(driver.findElement(By.xpath("//tr[5]/td[3]/span")));
-            Assert.fail("Exception NoSuchElementException");
-        }catch (NoSuchElementException thrown){
+            fieldEmail.sendKeys(userEmail);
+            buttonReg.click();
+            assertNull(wayErrorFieldEmail);
+            Assert.fail("Exception AssertionError");
+        }catch (AssertionError thrown){
             Assert.assertNotEquals("", thrown.getMessage());
         }
 
-        driver.findElement(By.id(email)).clear();
-        driver.findElement(By.id(email)).sendKeys("");
-        driver.findElement(By.name(registerForm)).click();
+        fieldEmail.clear();
+        fieldEmail.sendKeys("");
+        buttonReg.click();
         assertEquals("email field can't be empty",
-                driver.findElement(By.xpath("//tr[5]/td[3]/span")).getText());
+                wayErrorFieldEmail.getText());
 
-        driver.findElement(By.id(email)).clear();
-        driver.findElement(By.id(email)).sendKeys("email");
-        driver.findElement(By.name(registerForm)).click();
+        fieldEmail.clear();
+        fieldEmail.sendKeys("email");
+        buttonReg.click();
         assertEquals("Email address is incorrect.",
-                driver.findElement(By.xpath("//tr[5]/td[3]/span")).getText());
+                wayErrorFieldEmail.getText());
 
-        driver.findElement(By.id(email)).clear();
-        driver.findElement(By.id(email)).sendKeys("email@");
-        driver.findElement(By.name(registerForm)).click();
+        fieldEmail.clear();
+        fieldEmail.sendKeys("email@");
+        buttonReg.click();
         assertEquals("Email address is incorrect.",
-                driver.findElement(By.xpath("//tr[5]/td[3]/span")).getText());
+                wayErrorFieldEmail.getText());
 
-        driver.findElement(By.id(email)).clear();
-        driver.findElement(By.id(email)).sendKeys("email@.ru");
-        driver.findElement(By.name(registerForm)).click();
+        fieldEmail.clear();
+        fieldEmail.sendKeys("email@.ru");
+        buttonReg.click();
         assertEquals("Email address is incorrect.",
-                driver.findElement(By.xpath("//tr[5]/td[3]/span")).getText());
+                wayErrorFieldEmail.getText());
 
-        driver.findElement(By.id(email)).clear();
-        driver.findElement(By.id(email)).sendKeys("@pochta.ru");
-        driver.findElement(By.name(registerForm)).click();
+        fieldEmail.clear();
+        fieldEmail.sendKeys("@pochta.ru");
+        buttonReg.click();
         assertEquals("Email address is incorrect.",
-                driver.findElement(By.xpath("//tr[5]/td[3]/span")).getText());
+                wayErrorFieldEmail.getText());
     }
 
     @Test
     public void testAllFieldsCorrectFilledIn() {
-        String password = gen.generationUserPassword();
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
-        driver.findElement(By.id(userName)).sendKeys(gen.generationUserName());
-        driver.findElement(By.id(userPassword)).sendKeys(password);
-        driver.findElement(By.id(confirmPassword)).sendKeys(password);
-        driver.findElement(By.id(email)).sendKeys("email@pochta.ru");
-        driver.findElement(By.name(registerForm)).click();
+        String userPassword = generation.generationUserPassword();
+        init(driver);
+        fieldName.sendKeys(userName);
+        fieldPassword.sendKeys(userPassword);
+        fieldConfirmPassword.sendKeys(userPassword);
+        fieldEmail.sendKeys(userEmail);
+        buttonReg.click();
         assertEquals("You have successfully registered\n" +
                         "Use your credentials to login",
-                driver.findElement(By.xpath("//div[2]/div")).getText());
+                wayMessageOfRegistration.getText());
     }
 
 //   В данном тесте должна появляться строка "Please fill out the form once again".
     @Test
     public void testAllFieldsIncorrectFilledIn() {
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
-        driver.findElement(By.id(userName)).sendKeys("Name");
-        driver.findElement(By.id(userPassword)).sendKeys("Password1");
-        driver.findElement(By.id(confirmPassword)).sendKeys("Password1");
-        driver.findElement(By.id(email)).sendKeys("email@.ru");
-        driver.findElement(By.name(registerForm)).click();
+        init(driver);
+        fieldName.sendKeys("Name");
+        fieldPassword.sendKeys("Password1");
+        fieldConfirmPassword.sendKeys("Password1");
+        fieldEmail.sendKeys("email@.ru");
+        buttonReg.click();
         assertEquals("Please fill out the form once again",
-                driver.findElement(By.xpath("//div[2]/div")).getText());
+                wayMessageOfRegistration.getText());
     }
 
     @Test
     public void testUniquenessOfTheUserNameField(){
         driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
-        driver.findElement(By.id(userName)).sendKeys("Name12");
-        driver.findElement(By.name(registerForm)).click();
+        init(driver);
+        fieldName.sendKeys("Name12");
+        buttonReg.click();
         assertEquals("User with such login already exists.",
-                driver.findElement(By.xpath("//tr[1]/td[3]/span")).getText());
+                wayErrorNameRepeat.getText());
     }
 
     @Test
     public void testMaxNumberOfUsersPerHour(){
         for (int i = 0; i <= 51; i++){
-            String password = gen.generationUserPassword();
+            String userPassword = generation.generationUserPassword();
             driver.get("https://inventory.edu-netcracker.com/pages/registration.xhtml");
-            driver.findElement(By.id(userName)).sendKeys(gen.generationUserName());
-            driver.findElement(By.id(userPassword)).sendKeys(password);
-            driver.findElement(By.id(confirmPassword)).sendKeys(password);
-            driver.findElement(By.id(email)).sendKeys(gen.generationEmail());
-            driver.findElement(By.name(registerForm)).click();
+            init(driver);
+            fieldName.sendKeys(userName);
+            fieldPassword.sendKeys(userPassword);
+            fieldConfirmPassword.sendKeys(userPassword);
+            fieldEmail.sendKeys(userEmail);
+            buttonReg.click();
         }
         assertEquals("Please fill out the form later.",
-                driver.findElement(By.xpath("//div/div[2]/div")).getText());
+                wayErrorMaxNumberUser.getText());
     }
 
     @After
