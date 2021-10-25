@@ -1,0 +1,15 @@
+dbbot==0.1
+decorator==3.4.0
+docutils==0.12
+Pygments==1.6
+requests==2.10.0
+robotframework==3.0
+robotframework-pabot==0.23
+robotframework-requests==0.4.5
+robotframework-ride==1.5.2.1
+robotframework-selenium2library==1.7.4
+robotframework-sudslibrary==0.8
+robotremoteserver==1.0.1
+selenium==2.43.0
+suds==0.4
+virtualenv==14.0.1
